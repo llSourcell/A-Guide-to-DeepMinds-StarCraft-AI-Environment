@@ -1,7 +1,7 @@
 import sys
 
 import baselines.common.tf_util as U
-import gflags as flags
+from absl import flags
 import numpy as np
 from baselines import deepq
 from pysc2.env import environment
