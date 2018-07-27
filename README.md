@@ -31,6 +31,16 @@ Also, you have to install `baselines` library.
 $ pip install baselines
 ```
 
+On Mac the `baselines` installation may fail due to lack of dependencies. Consider doing:
+```shell
+brew install cmake
+brew install openmpi
+```
+and then re-running 
+```shell
+$ pip install baselines
+```
+
 ## 2. Install StarCraft II
 
 ### Mac / Win
