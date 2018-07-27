@@ -65,6 +65,11 @@ $ python train_mineral_shards.py
 $ python enjoy_mineral_shards.py
 ```
 
+You may need to install gflags:
+```shell
+pip install python-gflags
+```
+
 ## Credits
 
 The credits for this code go to [chris-chris](https://github.com/chris-chris/pysc2-examples). I've merely created a wrapper to get people started. 
