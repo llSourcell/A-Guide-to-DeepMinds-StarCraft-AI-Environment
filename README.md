@@ -64,6 +64,10 @@ $ python train_mineral_shards.py
 ```shell
 $ python enjoy_mineral_shards.py
 ```
+You may need to (on Mac)
+```shell
+$ brew install gflags
+```
 
 ## Credits
 
