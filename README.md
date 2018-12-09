@@ -14,6 +14,11 @@ This is the code for [this](https://youtu.be/URWXG5jRB-A) video on on Youtube by
 
 ## Usage
 
+## 0. PreRequirement
+```
+brew install cmake openmpi # in mac
+pip3 install -r requirements.txt
+```
 
 ## 1. Get PySC2
 

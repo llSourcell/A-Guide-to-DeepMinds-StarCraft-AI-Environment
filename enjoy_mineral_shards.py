@@ -1,7 +1,8 @@
 import sys
 
 import baselines.common.tf_util as U
-import gflags as flags
+import baselines.deepq.utils as U2
+from absl import flags
 import numpy as np
 from baselines import deepq
 from pysc2.env import environment
@@ -31,9 +32,14 @@ FLAGS = flags.FLAGS
 def main():
   FLAGS(sys.argv)
   with sc2_env.SC2Env(
-      "CollectMineralShards",
+      _only_use_kwargs=False,
+      map_name="CollectMineralShards",
       step_mul=step_mul,
       visualize=True,
+      agent_interface_format=sc2_env.AgentInterfaceFormat(
+              feature_dimensions=sc2_env.Dimensions(
+                  screen=64,
+                  minimap=64)),
       game_steps_per_episode=steps * step_mul) as env:
 
     model = deepq.models.cnn_to_mlp(
@@ -43,7 +49,7 @@ def main():
     )
 
     def make_obs_ph(name):
-      return U.BatchInput((64, 64), name=name)
+      return U2.BatchInput((64, 64), name=name)
 
     act_params = {
       'make_obs_ph': make_obs_ph,
@@ -64,9 +70,9 @@ def main():
 
       while not done:
 
-        player_relative = step_result[0].observation["screen"][_PLAYER_RELATIVE]
+        player_relative = step_result[0].observation["feature_screen"][_PLAYER_RELATIVE]
 
-        obs = player_relative
+        obs = np.array(player_relative)
 
         player_y, player_x = (player_relative == _PLAYER_FRIENDLY).nonzero()
         player = [int(player_x.mean()), int(player_y.mean())]

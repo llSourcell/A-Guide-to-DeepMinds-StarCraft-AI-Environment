@@ -6,6 +6,7 @@ import tensorflow as tf
 import zipfile
 
 import baselines.common.tf_util as U
+import baselines.deepq.utils as U2
 
 from baselines import logger
 from baselines.common.schedules import LinearSchedule
@@ -17,7 +18,7 @@ from pysc2.env import environment
 from pysc2.lib import features
 from pysc2.lib import actions
 
-import gflags as flags
+from absl import flags
 
 _PLAYER_RELATIVE = features.SCREEN_FEATURES.player_relative.index
 _PLAYER_FRIENDLY = 1
@@ -50,7 +51,7 @@ class ActWrapper(object):
         f.write(model_data)
 
       zipfile.ZipFile(arc_path, 'r', zipfile.ZIP_DEFLATED).extractall(td)
-      U.load_state(os.path.join(td, "model"))
+      U2.load_state(os.path.join(td, "model"))
 
     return ActWrapper(act)
 
@@ -60,7 +61,7 @@ class ActWrapper(object):
   def save(self, path):
     """Save model to a pickle located at `path`"""
     with tempfile.TemporaryDirectory() as td:
-      U.save_state(os.path.join(td, "model"))
+      U2.save_state(os.path.join(td, "model"))
       arc_name = os.path.join(td, "packed.zip")
       with zipfile.ZipFile(arc_name, 'w') as zipf:
         for root, dirs, files in os.walk(td):
@@ -190,7 +191,7 @@ def learn(env,
   sess.__enter__()
 
   def make_obs_ph(name):
-    return U.BatchInput((64, 64), name=name)
+    return U2.BatchInput((64, 64), name=name)
 
   act, train, update_target, debug = deepq.build_train(
     make_obs_ph=make_obs_ph,
@@ -236,9 +237,9 @@ def learn(env,
   # Select all marines first
   obs = env.step(actions=[sc2_actions.FunctionCall(_SELECT_ARMY, [_SELECT_ALL])])
 
-  player_relative = obs[0].observation["screen"][_PLAYER_RELATIVE]
+  player_relative = obs[0].observation["feature_screen"][_PLAYER_RELATIVE]
 
-  screen = player_relative + path_memory
+  screen = np.array(player_relative + path_memory)
 
   player_y, player_x = (player_relative == _PLAYER_FRIENDLY).nonzero()
   player = [int(player_x.mean()), int(player_y.mean())]
@@ -351,8 +352,8 @@ def learn(env,
 
       obs = env.step(actions=new_action)
 
-      player_relative = obs[0].observation["screen"][_PLAYER_RELATIVE]
-      new_screen = player_relative + path_memory
+      player_relative = obs[0].observation["feature_screen"][_PLAYER_RELATIVE]
+      new_screen = np.array(player_relative + path_memory)
 
       player_y, player_x = (player_relative == _PLAYER_FRIENDLY).nonzero()
       player = [int(player_x.mean()), int(player_y.mean())]
@@ -380,9 +381,9 @@ def learn(env,
 
       if done:
         obs = env.reset()
-        player_relative = obs[0].observation["screen"][_PLAYER_RELATIVE]
+        player_relative = obs[0].observation["feature_screen"][_PLAYER_RELATIVE]
 
-        screen = player_relative + path_memory
+        screen = np.array(player_relative + path_memory)
 
         player_y, player_x = (player_relative == _PLAYER_FRIENDLY).nonzero()
         player = [int(player_x.mean()), int(player_y.mean())]
@@ -440,13 +441,13 @@ def learn(env,
           if print_freq is not None:
             logger.log("Saving model due to mean reward increase: {} -> {}".format(
               saved_mean_reward, mean_100ep_reward))
-          U.save_state(model_file)
+          U2.save_state(model_file)
           model_saved = True
           saved_mean_reward = mean_100ep_reward
     if model_saved:
       if print_freq is not None:
         logger.log("Restored model with mean reward: {}".format(saved_mean_reward))
-      U.load_state(model_file)
+      U2.load_state(model_file)
 
   return ActWrapper(act)
 
