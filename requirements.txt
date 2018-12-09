@@ -1,0 +1,3 @@
+tensorflow==1.4.0
+pysc2
+baselines==0.1.5

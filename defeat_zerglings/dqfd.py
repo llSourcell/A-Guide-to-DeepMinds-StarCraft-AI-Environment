@@ -19,7 +19,7 @@ from pysc2.lib import actions
 
 from defeat_zerglings import common
 
-import gflags as flags
+from absl import flags
 
 _PLAYER_RELATIVE = features.SCREEN_FEATURES.player_relative.index
 
