@@ -1,6 +1,6 @@
 import sys
 
-import gflags as flags
+from absl import flags
 from baselines import deepq
 from pysc2.env import sc2_env
 from pysc2.lib import actions
@@ -19,8 +19,13 @@ FLAGS = flags.FLAGS
 def main():
   FLAGS(sys.argv)
   with sc2_env.SC2Env(
-      "CollectMineralShards",
+      map_name="CollectMineralShards",
       step_mul=step_mul,
+      players=[sc2_env.Agent(sc2_env.Race.terran)],
+      agent_interface_format=sc2_env.AgentInterfaceFormat(
+        feature_dimensions=sc2_env.Dimensions(
+        screen=64,
+        minimap=64)),
       visualize=True) as env:
 
     model = deepq.models.cnn_to_mlp(

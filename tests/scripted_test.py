@@ -12,7 +12,7 @@ from pysc2.lib import actions as sc2_actions
 from pysc2.lib import features
 
 from pysc2.lib import basetest
-import gflags as flags
+from absl import flags
 import sys
 
 _NO_OP = sc2_actions.FUNCTIONS.no_op.id
@@ -28,9 +28,14 @@ class TestScripted(utils.TestCase):
     FLAGS(sys.argv)
 
     with sc2_env.SC2Env(
-        "DefeatZerglingsAndBanelings",
+        map_name="DefeatZerglingsAndBanelings",
         step_mul=self.step_mul,
         visualize=True,
+        players=[sc2_env.Agent(sc2_env.Race.terran)],
+        agent_interface_format=sc2_env.AgentInterfaceFormat(
+          feature_dimensions=sc2_env.Dimensions(
+          screen=64,
+          minimap=64)),
         game_steps_per_episode=self.steps * self.step_mul) as env:
       obs = env.step(actions=[sc2_actions.FunctionCall(_NO_OP, [])])
       player_relative = obs[0].observation["screen"][_PLAYER_RELATIVE]

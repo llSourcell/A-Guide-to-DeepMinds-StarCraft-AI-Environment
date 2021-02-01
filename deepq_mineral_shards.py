@@ -17,7 +17,7 @@ from pysc2.env import environment
 from pysc2.lib import features
 from pysc2.lib import actions
 
-import gflags as flags
+from absl import flags
 
 _PLAYER_RELATIVE = features.SCREEN_FEATURES.player_relative.index
 _PLAYER_FRIENDLY = 1
